@@ -1,0 +1,31 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>{{ playlist.name }}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div class="item-detail" padding>
+    <h2>{{playlist.name}}</h2>
+    <button ion-button color="secondary" round (click)="playSelectedPlaylist()">Play</button>
+    <ion-list *ngIf="this.playlist.playlistSong">
+      <ion-item-sliding *ngFor="let pls of this.playlist.playlistSong index as i">
+        <button ion-item detail-none (click)="openPlaylistSong(pls)">
+          <ion-thumbnail item-start>
+            <img [src]="this.itemBuilder.getThumbnail(pls.song.url)" />
+          </ion-thumbnail>
+          <h2>{{pls.song.name}}</h2>
+        </button>
+
+        <ion-item-options>
+          <button ion-button color="danger" (click)="deleteSongFromPlaylist(pls, i)">
+            {{ 'DELETE_BUTTON' | translate }}
+          </button>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+</ion-content>

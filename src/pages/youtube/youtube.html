@@ -1,0 +1,52 @@
+<ion-header>
+
+    <ion-navbar>
+        <ion-title *ngIf="this.currentPlaylist">{{ this.currentPlaylist.name }}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+<ion-content no-bounce>
+    <div ion-fixed>
+        <youtube-player [videoId]="this.videoId" [height]="getScreenHeight()" [width]="getScreenWidth()" (ready)="savePlayer($event)"
+            (change)="onStateChange($event)"></youtube-player>
+
+        <ion-list class="playlist-list" *ngIf="this.currentPlaylist">
+            <ion-item-sliding *ngFor="let pls of this.currentPlaylist.playlistSong index as i">
+                <button ion-item detail-none [style.background-color]="this.onSongIndex === i ? '#BEBEBE' : '#FFFFFF'" (click)="playSongOnTap(i)">
+                    <!--FIRST:918A8A SECOND: #BEBEBE-->
+                    <ion-thumbnail item-start>
+                        <img [src]="this.itemBuilder.getThumbnail(pls.song.url)" />
+                    </ion-thumbnail>
+                    <h2>{{pls.song.name}}</h2>
+                </button>
+
+                <ion-item-options>
+                    <button ion-button color="danger" (click)="removeSongFromPlaylist(pls)">
+                        {{ 'DELETE_BUTTON' | translate }}
+                    </button>
+                </ion-item-options>
+            </ion-item-sliding>
+        </ion-list>
+    </div>
+</ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+        <button ion-button clear color="dark" large (click)="this.playNextSong(-1)">
+            <ion-icon name="skip-backward"></ion-icon>
+        </button>
+
+        <button class="" ion-button clear color="dark" large (click)="pauseOrPlayClicked()">
+            <ion-icon [name]="this.paused ? 'play' : 'pause'"></ion-icon>
+
+        </button>
+        <button class="" ion-button clear color="dark" large (click)="this.playNextSong(1)">
+            <ion-icon name="skip-forward"></ion-icon>
+        </button>
+        <button class="" ion-button clear color="dark" large (click)="this.repeat = !this.repeat">
+            <img class="toolbar-button" src="{{this.repeat ? 'assets/imgs/playlist/repeat_song_on_black.png' : 'assets/imgs/playlist/repeat_song_off_black.png'}}"
+            />
+        </button>
+
+    </ion-toolbar>
+</ion-footer>

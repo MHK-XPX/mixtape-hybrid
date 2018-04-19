@@ -1,0 +1,29 @@
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+ion-icon {
+  font-size: 35px; //Preferred size here
+}
+
+.no-padding {
+  padding: 0px !important;
+}
+
+.playlist-list{
+  max-height: 45vh;
+  overflow: auto;
+}
+
+.shadow{
+  box-shadow:         3px 3px 5px 6px #ccc;
+  -moz-box-shadow:    3px 3px 5px 6px #ccc;
+  -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+}
+
+.toolbar-button{
+  max-width: 10vw;
+  max-height: 10vh;
+}
