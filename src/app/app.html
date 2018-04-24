@@ -4,25 +4,20 @@
             <ion-title>Playlists</ion-title>
             <ion-buttons end>
                 <button ion-button icon-only *ngIf="this.itemBuilder.hasUser()" (click)="addNewPlaylist()">
-                  <ion-icon name="add"></ion-icon>
+                    <ion-icon name="add"></ion-icon>
                 </button>
-              </ion-buttons>
+            </ion-buttons>
         </ion-toolbar>
     </ion-header>
 
     <ion-content>
         <ion-list menuClose *ngIf="this.userPlaylists">
-            <ion-item-sliding *ngFor="let playlist of userPlaylists">
-                <button ion-item (click)="openPlaylistDetails(playlist)">
-                    <h2>{{playlist.name}}</h2>
-                </button>
 
-                <ion-item-options side="left">
-                    <button ion-button color="danger" (click)="deletePlaylist(playlist)">
-                        {{ 'DELETE_BUTTON' | translate }}
-                    </button>
-                </ion-item-options>
-            </ion-item-sliding>
+            <button ion-item *ngFor="let playlist of userPlaylists index as i" (tap)="openPlaylistDetails(playlist)" (press)="doPlaylistPressActions(playlist, i)">
+                <h2>{{playlist.name}}</h2>
+            </button>
+
+            <ion-item *ngIf="this.itemBuilder.user._user" (click)="openPlaylistManager()">Manage Playlists</ion-item>
             <ion-item *ngIf="this.itemBuilder.user._user" (click)="goToLogin()">{{ this.itemBuilder.user._user ? 'Logout' : 'Login'}}</ion-item>
             <ion-item *ngIf="!this.itemBuilder.user._user" (click)="goToLogin()">Login</ion-item>
         </ion-list>

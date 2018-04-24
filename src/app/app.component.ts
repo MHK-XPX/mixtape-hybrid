@@ -7,7 +7,8 @@ import { Component, ViewChild } from '@angular/core';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { Config, Nav, Platform } from 'ionic-angular';
+import { Config, Nav, Platform, MenuController, AlertController } from 'ionic-angular';
+import { ActionSheetController } from 'ionic-angular';
 
 import { FirstRunPage } from '../pages/pages';
 import { Settings } from '../providers/providers';
@@ -33,9 +34,10 @@ export class MyApp {
     { title: 'Search', component: 'SearchPage' }
   ]
 
-  constructor(private translate: TranslateService, platform: Platform, settings: Settings, 
-              private config: Config, private statusBar: StatusBar, private splashScreen: SplashScreen, 
-              public itemBuilder: ItemBuilder, public playlists: Playlists) {
+  constructor(private translate: TranslateService, platform: Platform, settings: Settings,
+    private config: Config, private statusBar: StatusBar, private splashScreen: SplashScreen,
+    public itemBuilder: ItemBuilder, public playlists: Playlists, private alertCtrl: AlertController,
+    private actionSheetCtrl: ActionSheetController, private menuCtrl: MenuController) {
 
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -81,6 +83,7 @@ export class MyApp {
     this.nav.setRoot(page.component);
   }
 
+  
   /*
     This method is called when the user selects a playlist from the side-menu
     it pulls the playlist they selected from the api and moves us to the detail page
@@ -100,19 +103,96 @@ export class MyApp {
     )
   }
 
-  addNewPlaylist(){
-    console.log("ADD NEW PLAYLIST");
+  openPlaylistManager() {
+    this.nav.push('PlaylistManagerPage');
   }
 
-  deletePlaylist(playlist: Playlist){
-    console.log("REMOVE PLAYLIST");
+  addNewPlaylist() {
+    let p = {
+      name: "Playlist " + (this.userPlaylists.length + 1),
+      playlistSong: [],
+      userId: this.itemBuilder.user._user.userId
+    };
+
+    let returnedPlaylist: Playlist;
+
+    this.itemBuilder.createNewPlaylist(p).subscribe(
+      d => returnedPlaylist = d,
+      err => console.log("Unable to create playlist", err),
+      () => {
+        this.userPlaylists.push(returnedPlaylist);
+        this.itemBuilder.updateUserPlaylists(this.userPlaylists);
+        this.itemBuilder.doToastMessage("New playlist created");
+      }
+    );
+  }
+
+  deletePlaylist(playlist: Playlist, index: number) {
+    let p: Playlist = this.userPlaylists[index];
+
+    this.itemBuilder.removeEntity<Playlist>("Playlists", p.playlistId).subscribe(
+      d => d = d,
+      err => this.itemBuilder.doToastMessage("Unable to delete playlist: " + p.name),
+      () => {
+        this.userPlaylists.splice(index, 1);
+        this.itemBuilder.updateUserPlaylists(this.userPlaylists);
+        this.itemBuilder.doToastMessage("Deleted playlist: " + p.name);
+      }
+    );
+  }
+
+
+  doPlaylistPressActions(playlist: Playlist, index: number) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: "Edit Playlist",
+      buttons: [
+        {
+          text: 'Delete Playlist',
+          role: 'destructive',
+          handler: () => {
+            // this.deletePlaylist(playlist, index);
+           this.doConfirmDeleteActions(playlist, index);
+          },
+        },{
+          text: 'Play',
+          handler: () =>{
+            this.itemBuilder.updateCurrentPlaylist(playlist);
+            this.menuCtrl.close();
+          }
+        },{
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
+  doConfirmDeleteActions(playlist: Playlist, index: number){
+    let confirm = this.alertCtrl.create({
+      title: "Are you sure?",
+      message: "Do you want to delte playlist: " + playlist.name + "?",
+      buttons: [
+        {
+          text: "No",
+          role: 'cancel',
+        },
+        {
+          text: "Yes",
+          handler: () =>{
+            this.deletePlaylist(playlist, index);
+          }
+        }
+      ]
+    });
+    confirm.present();
   }
 
   /*
     This method is called when we click login or logout, it clears all potential values
     of the Subjects form item.builder.ts and navigates us to the login page
   */
-  goToLogin(){
+  goToLogin() {
     this.itemBuilder.clearAll();
     this.nav.setRoot('LoginPage');
   }

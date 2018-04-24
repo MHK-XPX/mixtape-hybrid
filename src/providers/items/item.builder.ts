@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { PlaylistSong } from '../../models/playlistsong';
+import { ToastController } from 'ionic-angular';
 
 @Injectable()
 export class ItemBuilder {
@@ -28,7 +29,7 @@ export class ItemBuilder {
     public currentPlaylist: Subject<Playlist> = new BehaviorSubject<Playlist>(null);
     public userPlaylists: Subject<Playlist[]> = new BehaviorSubject<Playlist[]>([]);
 
-    constructor(public api: Api, public user: User) { }
+    constructor(public api: Api, public user: User, private toastCtrl: ToastController) { }
 
     /*
         This method is called whenever the user logs in, it will return all of their playlists
@@ -57,6 +58,10 @@ export class ItemBuilder {
         return this.api.getAllEntities<T>(path);
     }
 
+    public createNewPlaylist(playlist: object): Observable<Playlist> {
+        return this.api.postEntity("Playlists", playlist);
+    }
+
     /*
         This method is called when we need to remove a song from a given playlist.
         Once the song is removed from the DB, we update the User's playlist subject
@@ -64,7 +69,7 @@ export class ItemBuilder {
         @param id: number - The playlist song id to remove from the DB
         @param playlist: Playlist - The playlist we are going to remove the song from
     */
-    public removeSongFromPlaylist(id: number, playlist: Playlist){
+    public removeSongFromPlaylist(id: number, playlist: Playlist) {
         let songIndex = playlist.playlistSong.findIndex(pls => pls.playlistSongId === id);
 
         this.api.deleteEntity<PlaylistSong>("PlaylistSongs", id).subscribe(
@@ -84,7 +89,7 @@ export class ItemBuilder {
         @param id: number - The ID of the entity we want to remove at endpoint <path>
         @return Observable<T> - An observable of type T, containing the entity removed from the DB.
     */
-    public removeEntity<T>(path: string, id: number): Observable<T>{
+    public removeEntity<T>(path: string, id: number): Observable<T> {
         return this.api.deleteEntity<T>(path, id);
     }
 
@@ -105,11 +110,25 @@ export class ItemBuilder {
         this.userPlaylists.next(playlists);
     }
 
+    public doToastMessage(message: string) {
+        let toast = this.toastCtrl.create({
+            message: message,
+            duration: 3000,
+            showCloseButton: true,
+            closeButtonText: "Ok",
+            //cssClass: 'toast.scss'
+        });
+
+
+        toast.present();
+
+    }
+
     /*
         This method is calle don logout, it will remove the user values, the playlist values, and the list of playlists
         so that if the user were to login as another user they will not see their data
     */
-    public clearAll(){
+    public clearAll() {
         this.user.logout();
         this.updateCurrentPlaylist(null);
         this.updateUserPlaylists([]);
@@ -119,7 +138,7 @@ export class ItemBuilder {
         Returns if the user is logged in or not (IE the user will have a value if they are)
         @return boolean - if the user is logged in or not
     */
-    public hasUser(): boolean{
+    public hasUser(): boolean {
         return this.user._user !== null && this.user._user !== undefined;
     }
 
