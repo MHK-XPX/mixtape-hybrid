@@ -29,7 +29,7 @@ export class ItemBuilder {
     public currentPlaylist: Subject<Playlist> = new BehaviorSubject<Playlist>(null);
     public userPlaylists: Subject<Playlist[]> = new BehaviorSubject<Playlist[]>([]);
 
-    constructor(public api: Api, public user: User, private toastCtrl: ToastController) { }
+    constructor(public api: Api, public user: User, private toastCtrl: ToastController) {}
 
     /*
         This method is called whenever the user logs in, it will return all of their playlists
@@ -78,13 +78,17 @@ export class ItemBuilder {
 
         this.api.deleteEntity<PlaylistSong>("PlaylistSongs", id).subscribe(
             d => d = d,
-            err => console.log(err),
+            err => this.doToastMessage("Unable to remove song from: " + playlist.name),
             () => {
                 playlist.playlistSong.splice(songIndex, 1);
                 this.updateCurrentPlaylist(playlist);
-                console.log("Removed!");
+                this.doToastMessage("Successfully removed");
             }
         );
+    }
+
+    public addEntity<T>(path: string, entity: any): Observable<T>{
+        return this.api.postEntity(path, entity);
     }
 
     /*
@@ -114,6 +118,18 @@ export class ItemBuilder {
         this.userPlaylists.next(playlists);
     }
 
+    public repullOnCurrentPlaylistUpdate(playlistID: number){
+        let p: Playlist;
+        let s: Subscription = this.singleQuery<Playlist>("Playlists", playlistID).subscribe(
+          d => p = d,
+          err => console.log(err),
+          () => {
+            s.unsubscribe();
+            this.updateCurrentPlaylist(p);
+          }
+        )
+      }
+
     public doToastMessage(message: string) {
         let toast = this.toastCtrl.create({
             message: message,
@@ -123,9 +139,7 @@ export class ItemBuilder {
             //cssClass: 'toast.scss'
         });
 
-
         toast.present();
-
     }
 
     /*

@@ -12,6 +12,8 @@ import { ItemBuilder } from '../../providers/providers';
 import { Playlist } from '../../models/playlist';
 import { PlaylistSong } from '../../models/playlistsong';
 import { Song } from '../../models/song';
+import { Artist } from '../../models/artist';
+import { Album } from '../../models/album';
 
 @IonicPage()
 @Component({
@@ -19,12 +21,18 @@ import { Song } from '../../models/song';
   templateUrl: 'item-detail.html'
 })
 export class ItemDetailPage {
+  artist: Artist;
+  album: Album;
+  song: Song;
+
   playlist: Playlist;
   songDetail: Song;
 
 
   constructor(public navCtrl: NavController, navParams: NavParams, public itemBuilder: ItemBuilder) {
     this.playlist = navParams.get('playlist') || [];
+    this.artist = navParams.get('artist') || null;
+    this.album = navParams.get('album') || null;
   }
 
   //NOT ADDED YET
@@ -53,8 +61,12 @@ export class ItemDetailPage {
   deleteSongFromPlaylist(pls: PlaylistSong, index: number){
     this.itemBuilder.removeEntity<PlaylistSong>("PlaylistSongs", pls.playlistSongId).subscribe(
       d => d = d,
-      err => console.log(err),
-      () => this.playlist.playlistSong.splice(index, 1)
+      err => this.itemBuilder.doToastMessage("Unable to remove song"),
+      () => {
+        this.playlist.playlistSong.splice(index, 1)
+        this.itemBuilder.updateCurrentPlaylist(this.playlist);
+        this.itemBuilder.doToastMessage("Successfully removed");
+      }
     );
   }
 

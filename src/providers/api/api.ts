@@ -62,9 +62,10 @@ export class Api {
 
   postEntity<T>(path: string, obj: any): Observable<T>{
     let headers: HttpHeaders = new HttpHeaders(
-      {"Authorization": "Bearer " + this._token}
+      {"Authorization": "Bearer " + this._token},
     );
 
+    headers.append('Access-Control-Allow-Origin', '*');
     return this.http.post(this.url + path, obj, {headers}) as Observable<T>;
   }
 

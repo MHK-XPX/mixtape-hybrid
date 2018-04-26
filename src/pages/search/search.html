@@ -16,7 +16,7 @@
       <ion-list-header *ngIf="searchResults.artists">
         Artists
       </ion-list-header>
-      <button ion-item (click)="openItem(item)" *ngFor="let artist of searchResults.artists">
+      <button ion-item (click)="openArtist(artist)" *ngFor="let artist of searchResults.artists">
         <h2>{{artist.name}}</h2>
       </button>
     </ion-list>
@@ -25,7 +25,7 @@
       <ion-list-header *ngIf="searchResults.albums">
         Albums
       </ion-list-header>
-      <button ion-item (click)="openItem(item)" *ngFor="let album of searchResults.albums">
+      <button ion-item (click)="openAlbum(album)" *ngFor="let album of searchResults.albums">
         <h2>{{album.name}}</h2>
       </button>
     </ion-list>
@@ -34,9 +34,10 @@
       <ion-list-header *ngIf="searchResults.songs">
         Songs
       </ion-list-header>
-      <button ion-item (click)="openItem(item)" *ngFor="let song of searchResults.songs">
-        <h2>{{song.name}}</h2>
-      </button>
+      <ion-item (click)="openSong(song)" *ngFor="let song of searchResults.songs">
+        {{song.name}}
+        <ion-icon name="add" small item-right></ion-icon>
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>
