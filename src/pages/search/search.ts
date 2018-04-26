@@ -1,8 +1,12 @@
 //NOT USED
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Observable } from 'rxjs/Observable';
 
 import { Item } from '../../models/item';
+import { ItemBuilder } from '../../providers/providers';
+import { SearchResults } from '../../models/searchresults';
+import { Subscription } from 'rxjs/Subscription';
 
 @IonicPage()
 @Component({
@@ -11,9 +15,9 @@ import { Item } from '../../models/item';
 })
 export class SearchPage {
 
-  currentItems: any = [];
+  searchResults: SearchResults;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) { }
+  constructor(public navCtrl: NavController, public navParams: NavParams, private itemBuilder: ItemBuilder) { }
 
   /**
    * Perform a service for the proper items.
@@ -28,6 +32,20 @@ export class SearchPage {
       name: val
     });
   }*/
+
+  getItems(ev){
+    let val: string = ev.target.value;
+
+    if(!val || !val.trim() || val.length == 0){
+      this.searchResults = null;
+    }
+
+    let s: Subscription = this.itemBuilder.searchQuery<SearchResults>("Search", val).subscribe(
+      d => this.searchResults = d,
+      err => console.log("Cant find results"),
+      () => s.unsubscribe()
+    );
+  }
 
   /**
    * Navigate to the detail page for this item.

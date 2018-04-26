@@ -36,6 +36,14 @@ export class Api {
     return this.http.get(this.url + "Auth/me", {headers});
   }
 
+  getSingleEntityWithNoID<T>(path: string): Observable<T>{
+    let headers: HttpHeaders = new HttpHeaders(
+      {"Authorization": "Bearer " + this._token}
+    );
+
+    return this.http.get(this.url + path, {headers}) as Observable<T>;
+  }
+
   getSingleEntity<T>(path: string, id: number): Observable<T>{
     let headers: HttpHeaders = new HttpHeaders(
       {"Authorization": "Bearer " + this._token}

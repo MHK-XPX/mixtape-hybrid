@@ -103,10 +103,6 @@ export class MyApp {
     )
   }
 
-  openPlaylistManager() {
-    this.nav.push('PlaylistManagerPage');
-  }
-
   addNewPlaylist() {
     let p = {
       name: "Playlist " + (this.userPlaylists.length + 1),
@@ -186,6 +182,14 @@ export class MyApp {
       ]
     });
     confirm.present();
+  }
+
+  openSearch(){
+    this.nav.push("SearchPage");
+  }
+
+  openPlaylistManager() {
+    this.nav.push('PlaylistManagerPage');
   }
 
   /*

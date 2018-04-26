@@ -49,6 +49,10 @@ export class ItemBuilder {
         return this.api.getSingleEntity<T>(path, id);
     }
 
+    public searchQuery<T>(path: string, search: string): Observable<T>{
+        return this.api.getSingleEntityWithNoID(path + "/" + search);
+    }
+
     /*
         This method is called when we want to pull all entities from a given endpoint from the api
         @param path: string - The path to the endpoint we want to call

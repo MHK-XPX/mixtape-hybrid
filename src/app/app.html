@@ -17,7 +17,8 @@
                 <h2>{{playlist.name}}</h2>
             </button>
 
-            <ion-item *ngIf="this.itemBuilder.user._user" (click)="openPlaylistManager()">Manage Playlists</ion-item>
+            <!--<ion-item *ngIf="this.itemBuilder.user._user" (click)="openPlaylistManager()">Manage Playlists</ion-item>-->
+            <ion-item *ngIf="this.itemBuilder.user._user" (click)="openSearch()">Search</ion-item>
             <ion-item *ngIf="this.itemBuilder.user._user" (click)="goToLogin()">{{ this.itemBuilder.user._user ? 'Logout' : 'Login'}}</ion-item>
             <ion-item *ngIf="!this.itemBuilder.user._user" (click)="goToLogin()">Login</ion-item>
         </ion-list>
