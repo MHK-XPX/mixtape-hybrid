@@ -4,7 +4,7 @@ import { IonicPage, NavController, NavParams, ActionSheetController } from 'ioni
 import { Observable } from 'rxjs/Observable';
 
 import { Item } from '../../models/item';
-import { ItemBuilder } from '../../providers/providers';
+import { ItemBuilder, PlaylistBuilder } from '../../providers/providers';
 import { SearchResults } from '../../models/searchresults';
 import { Subscription } from 'rxjs/Subscription';
 import { Artist } from '../../models/artist';
@@ -25,7 +25,7 @@ export class SearchPage {
 
   searchResults: SearchResults;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private itemBuilder: ItemBuilder, private actionSheetCtrl: ActionSheetController) { }
+  constructor(public navCtrl: NavController, public navParams: NavParams, private itemBuilder: ItemBuilder, private playlistBuilder: PlaylistBuilder, private actionSheetCtrl: ActionSheetController) { }
 
   /**
    * Perform a service for the proper items.
@@ -76,6 +76,7 @@ export class SearchPage {
       () => {
         s.unsubscribe();
         this.navCtrl.push('ItemDetailPage', {
+          userPlaylists: this.userPlaylists,
           artist: a
         });
       }
@@ -90,6 +91,7 @@ export class SearchPage {
       () => {
         s.unsubscribe();
         this.navCtrl.push('ItemDetailPage', {
+          userPlaylists: this.userPlaylists,
           album: a
         });
       }
@@ -123,29 +125,7 @@ export class SearchPage {
   }
 
   addSongToPlaylist(playlist: Playlist, song: Song, playlistIndex: number){
-    // console.log(playlist.name, song.name, playlistIndex);
-    let pls = {
-      playlistId: playlist.playlistId,
-      songId: song.songId,
-    };
-
-    let returnedPls: PlaylistSong;
-    let s: Subscription = this.itemBuilder.addEntity<PlaylistSong>("PlaylistSongs", pls).subscribe(
-      d => returnedPls = d,
-      err => this.itemBuilder.doToastMessage("Unable to add: " + song.name + " to " + playlist.name),
-      () => {
-        s.unsubscribe();
-
-        playlist.playlistSong.push(returnedPls);
-        this.userPlaylists[playlistIndex] = playlist;
-        this.itemBuilder.updateUserPlaylists(this.userPlaylists);
-
-        if(this.currentPlaylist && this.currentPlaylist.playlistId === playlist.playlistId){
-          // this.itemBuilder.updateCurrentPlaylist(playlist);
-          this.itemBuilder.repullOnCurrentPlaylistUpdate(this.currentPlaylist.playlistId );
-        }
-        this.itemBuilder.doToastMessage("Added: " + song.name + " to " + playlist.name);
-      }
-    );
+    let addingToCurrent: boolean = this.currentPlaylist.playlistId === playlist.playlistId;
+    this.playlistBuilder.add(playlist, this.userPlaylists, song, playlistIndex, addingToCurrent);
   }
 }

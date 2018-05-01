@@ -15,7 +15,7 @@ import { Settings } from '../providers/providers';
 
 import { ItemBuilder } from '../providers/items/item.builder';
 import { Playlist } from '../models/playlist';
-import { Playlists } from '../providers/items/playlists';
+import { PlaylistBuilder } from '../providers/items/playlist.builder';
 
 @Component({
   templateUrl: 'app.html'
@@ -36,7 +36,7 @@ export class MyApp {
 
   constructor(private translate: TranslateService, platform: Platform, settings: Settings,
     private config: Config, private statusBar: StatusBar, private splashScreen: SplashScreen,
-    public itemBuilder: ItemBuilder, public playlists: Playlists, private alertCtrl: AlertController,
+    public itemBuilder: ItemBuilder, public playlistBuilder: PlaylistBuilder, private alertCtrl: AlertController,
     private actionSheetCtrl: ActionSheetController, private menuCtrl: MenuController) {
 
     platform.ready().then(() => {
@@ -92,7 +92,7 @@ export class MyApp {
   openPlaylistDetails(playlist: Playlist) {
     let filledPlaylist: Playlist;
 
-    this.playlists.query(playlist.playlistId).subscribe(
+    this.playlistBuilder.query(playlist.playlistId).subscribe(
       d => filledPlaylist = d,
       err => console.log("Cannot get playlist"),
       () => {
@@ -104,37 +104,12 @@ export class MyApp {
   }
 
   addNewPlaylist() {
-    let p = {
-      name: "Playlist " + (this.userPlaylists.length + 1),
-      playlistSong: [],
-      userId: this.itemBuilder.user._user.userId
-    };
-
-    let returnedPlaylist: Playlist;
-
-    this.itemBuilder.createNewPlaylist(p).subscribe(
-      d => returnedPlaylist = d,
-      err => console.log("Unable to create playlist", err),
-      () => {
-        this.userPlaylists.push(returnedPlaylist);
-        this.itemBuilder.updateUserPlaylists(this.userPlaylists);
-        this.itemBuilder.doToastMessage("New playlist created");
-      }
-    );
+    this.playlistBuilder.create(this.userPlaylists);
   }
 
+  //MOVED TO playlist provider!
   deletePlaylist(playlist: Playlist, index: number) {
-    let p: Playlist = this.userPlaylists[index];
-
-    this.itemBuilder.removeEntity<Playlist>("Playlists", p.playlistId).subscribe(
-      d => d = d,
-      err => this.itemBuilder.doToastMessage("Unable to delete playlist: " + p.name),
-      () => {
-        this.userPlaylists.splice(index, 1);
-        this.itemBuilder.updateUserPlaylists(this.userPlaylists);
-        this.itemBuilder.doToastMessage("Deleted playlist: " + p.name);
-      }
-    );
+    this.playlistBuilder.delete(playlist, this.userPlaylists, index);
   }
 
 

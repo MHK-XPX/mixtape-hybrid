@@ -3,8 +3,7 @@ import { Component } from '@angular/core';
 import { IonicPage, ModalController, NavController } from 'ionic-angular';
 
 import { Item } from '../../models/item';
-import { Songs } from '../../providers/items/songs';
-import { Playlists } from '../../providers/items/playlists';
+import { PlaylistBuilder } from '../../providers/items/playlist.builder';
 import { Playlist } from '../../models/playlist'
 
 import { ItemBuilder} from '../../providers/items/item.builder';
@@ -17,26 +16,13 @@ import { ItemBuilder} from '../../providers/items/item.builder';
 export class ListMasterPage {
   currentItems: Playlist[];
 
-  constructor(public navCtrl: NavController, public songs: Songs, public playlists: Playlists, public modalCtrl: ModalController, public itemBuilder: ItemBuilder) {
+  constructor(public navCtrl: NavController, public playlistBuilder: PlaylistBuilder, public modalCtrl: ModalController, public itemBuilder: ItemBuilder) {
   }
 
   /**
    * The view loaded, let's query our items for the list
    */
   ionViewDidLoad() {
-    // this.currentItems = this.items.query();
-    // this.songs.query().subscribe(
-    //   d => this.currentItems = d,
-    //   err => console.log(err),
-
-    // );
-    // this.playlists.queryUserPlaylists().subscribe(
-    //   d => this.currentItems = d,
-    //   err => console.log(err)
-    // );
-
-
-    // console.log(this.itemBuilder.singleQuery<Playlist>());
     this.itemBuilder.queryUserPlaylists().subscribe(
       d => this.itemBuilder.updateUserPlaylists(d),
       err => console.log("Unable to get user playlists")
@@ -50,20 +36,20 @@ export class ListMasterPage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addItem() {
-    let addModal = this.modalCtrl.create('ItemCreatePage');
+    /*let addModal = this.modalCtrl.create('ItemCreatePage');
     addModal.onDidDismiss(item => {
       if (item) {
         this.songs.add(item);
       }
     })
-    addModal.present();
+    addModal.present();*/
   }
 
   /**
    * Delete an item from the list of items.
    */
   deleteItem(item) {
-    this.songs.delete(item);
+    //this.songs.delete(item);
   }
 
   /**
@@ -72,7 +58,7 @@ export class ListMasterPage {
   openItem(playlist: Playlist) {
     let filledPlaylist: Playlist;
 
-    this.playlists.query(playlist.playlistId).subscribe(
+    this.playlistBuilder.query(playlist.playlistId).subscribe(
       d => filledPlaylist = d,
       err => console.log("Cannot get playlist"),
       () => {

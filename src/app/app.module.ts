@@ -10,8 +10,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 
 import { ItemBuilder} from '../providers/items/item.builder';
-import { Playlists } from '../providers/items/playlists';
-import { Songs } from '../providers/items/songs';
+import { PlaylistBuilder } from '../providers/items/playlist.builder';
 import { Settings } from '../providers/providers';
 import { User } from '../providers/providers';
 import { Api } from '../providers/providers';
@@ -66,8 +65,7 @@ export function provideSettings(storage: Storage) {
   providers: [
     Api,
     ItemBuilder,
-    Playlists,
-    Songs,
+    PlaylistBuilder,
     User,
     Camera,
     SplashScreen,

@@ -11,6 +11,7 @@ import { ItemBuilder } from '../../providers/providers';
 import { Playlist } from '../../models/playlist';
 import { PlaylistSong } from '../../models/playlistsong';
 import { Song } from '../../models/song';
+import { PlaylistBuilder } from '../../providers/items/playlist.builder';
 
 @IonicPage()
 @Component({
@@ -31,7 +32,7 @@ export class YoutubePage {
     songDetail: Song;
 
 
-    constructor(public navCtrl: NavController, navParams: NavParams, public itemBuilder: ItemBuilder) {
+    constructor(public navCtrl: NavController, navParams: NavParams, public itemBuilder: ItemBuilder, public playlistBuilder: PlaylistBuilder) {
         //this.playlist = navParams.get('playlist') || [];
         this.itemBuilder.currentPlaylist.subscribe(res => this.loadPlaylist(res));
     }
@@ -92,7 +93,8 @@ export class YoutubePage {
         @param pls: PlaylistSong - The song to remove from the playlist
     */
     removeSongFromPlaylist(pls: PlaylistSong){
-        this.itemBuilder.removeSongFromPlaylist(pls.playlistSongId, this.currentPlaylist);
+        // this.itemBuilder.removeSongFromPlaylist(pls.playlistSongId, this.currentPlaylist);
+        this.playlistBuilder.removeSong(pls.playlistSongId, this.currentPlaylist);
     }
 
     /*

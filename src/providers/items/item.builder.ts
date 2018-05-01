@@ -3,24 +3,18 @@
     item.builder.ts is a provider that will make api calls and alert anyone subscribed to it.
         It will update user information, playlist information, and the list of all user playlists
 */
-
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
-import { forkJoin } from "rxjs/observable/forkJoin";
 
 import { User } from '../user/user'
 
 import { Playlist } from '../../models/playlist';
-import { Artist } from '../../models/artist';
-import { Album } from '../../models/album';
-import { Song } from '../../models/song';
 import { Api } from '../api/api';
 
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { PlaylistSong } from '../../models/playlistsong';
 import { ToastController } from 'ionic-angular';
 
 @Injectable()
@@ -29,7 +23,7 @@ export class ItemBuilder {
     public currentPlaylist: Subject<Playlist> = new BehaviorSubject<Playlist>(null);
     public userPlaylists: Subject<Playlist[]> = new BehaviorSubject<Playlist[]>([]);
 
-    constructor(public api: Api, public user: User, private toastCtrl: ToastController) {}
+    constructor(public api: Api, public user: User, public toastCtrl: ToastController) { }
 
     /*
         This method is called whenever the user logs in, it will return all of their playlists
@@ -49,7 +43,7 @@ export class ItemBuilder {
         return this.api.getSingleEntity<T>(path, id);
     }
 
-    public searchQuery<T>(path: string, search: string): Observable<T>{
+    public searchQuery<T>(path: string, search: string): Observable<T> {
         return this.api.getSingleEntityWithNoID(path + "/" + search);
     }
 
@@ -66,28 +60,7 @@ export class ItemBuilder {
         return this.api.postEntity("Playlists", playlist);
     }
 
-    /*
-        This method is called when we need to remove a song from a given playlist.
-        Once the song is removed from the DB, we update the User's playlist subject
-        which will alert all subscribers 
-        @param id: number - The playlist song id to remove from the DB
-        @param playlist: Playlist - The playlist we are going to remove the song from
-    */
-    public removeSongFromPlaylist(id: number, playlist: Playlist) {
-        let songIndex = playlist.playlistSong.findIndex(pls => pls.playlistSongId === id);
-
-        this.api.deleteEntity<PlaylistSong>("PlaylistSongs", id).subscribe(
-            d => d = d,
-            err => this.doToastMessage("Unable to remove song from: " + playlist.name),
-            () => {
-                playlist.playlistSong.splice(songIndex, 1);
-                this.updateCurrentPlaylist(playlist);
-                this.doToastMessage("Successfully removed");
-            }
-        );
-    }
-
-    public addEntity<T>(path: string, entity: any): Observable<T>{
+    public addEntity<T>(path: string, entity: any): Observable<T> {
         return this.api.postEntity(path, entity);
     }
 
@@ -118,17 +91,18 @@ export class ItemBuilder {
         this.userPlaylists.next(playlists);
     }
 
-    public repullOnCurrentPlaylistUpdate(playlistID: number){
+    //MOVED TO PLAYLIST PROVIDER
+    public repullOnCurrentPlaylistUpdate(playlistID: number) {
         let p: Playlist;
         let s: Subscription = this.singleQuery<Playlist>("Playlists", playlistID).subscribe(
-          d => p = d,
-          err => console.log(err),
-          () => {
-            s.unsubscribe();
-            this.updateCurrentPlaylist(p);
-          }
+            d => p = d,
+            err => console.log(err),
+            () => {
+                s.unsubscribe();
+                this.updateCurrentPlaylist(p);
+            }
         )
-      }
+    }
 
     public doToastMessage(message: string) {
         let toast = this.toastCtrl.create({

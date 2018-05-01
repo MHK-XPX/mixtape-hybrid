@@ -4,10 +4,10 @@
   It allows for the the user to play the selected playlist or make changes to it
 */
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ActionSheetController } from 'ionic-angular';
 
 import { YoutubePage } from '../youtube/youtube';
-import { ItemBuilder } from '../../providers/providers';
+import { ItemBuilder, PlaylistBuilder } from '../../providers/providers';
 
 import { Playlist } from '../../models/playlist';
 import { PlaylistSong } from '../../models/playlistsong';
@@ -25,11 +25,13 @@ export class ItemDetailPage {
   album: Album;
   song: Song;
 
+  userPlaylists: Playlist[];
   playlist: Playlist;
   songDetail: Song;
 
 
-  constructor(public navCtrl: NavController, navParams: NavParams, public itemBuilder: ItemBuilder) {
+  constructor(public navCtrl: NavController, navParams: NavParams, public itemBuilder: ItemBuilder, private playlistBuilder: PlaylistBuilder, private actionSheetCtrl: ActionSheetController) {
+    this.userPlaylists = navParams.get('userPlaylists') || [];
     this.playlist = navParams.get('playlist') || [];
     this.artist = navParams.get('artist') || null;
     this.album = navParams.get('album') || null;
@@ -68,6 +70,38 @@ export class ItemDetailPage {
         this.itemBuilder.doToastMessage("Successfully removed");
       }
     );
+  }
+
+
+  openSong(song: Song) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: "Add song to:",
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    let count = 0;
+    
+    for (let i = 0; i < this.userPlaylists.length; i++) {
+      var button = {
+        text: this.userPlaylists[i].name,
+        handler: () => {
+          //console.log("Adding to:", this.userPlaylists[i].name);
+          this.addSongToPlaylist(this.userPlaylists[i], song, i);
+        }
+      }
+      actionSheet.addButton(button);
+    }
+    actionSheet.present();
+  }
+
+  addSongToPlaylist(playlist: Playlist, song: Song, playlistIndex: number){
+    // let addingToCurrent: boolean = this.currentPlaylist.playlistId === playlist.playlistId;
+    this.playlistBuilder.add(playlist, this.userPlaylists, song, playlistIndex, false);
   }
 
 }

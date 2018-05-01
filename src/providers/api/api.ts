@@ -2,9 +2,8 @@
   Written by: Ryan Kruse
   Standard api service, all methods take and return type T.
 */
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()

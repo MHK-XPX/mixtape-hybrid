@@ -39,7 +39,7 @@
         {{album.name}}
       </ion-list-header>
 
-      <ion-item *ngFor="let song of album.song">
+      <ion-item *ngFor="let song of album.song" (click)="openSong(song)">
         {{song.name}}
         <ion-icon name="add" small item-right></ion-icon>
       </ion-item>
@@ -48,8 +48,8 @@
 
   <!--Album-->
   <div class="item-detail" padding *ngIf="this.album">
-    <ion-list *ngFor="let song of album.song">
-      <ion-item>
+    <ion-list>
+      <ion-item *ngFor="let song of album.song" (click)="openSong(song)">
         {{song.name}}
         <ion-icon name="add" small item-right></ion-icon>
       </ion-item>
